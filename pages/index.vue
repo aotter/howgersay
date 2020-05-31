@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="text-center text-secondary">
-      <small>假日不想寫作業一時興起的產物</small>
+      <small>假日不想寫作業一時興起的產物，博君一笑便民服務，影片屬How哥所有。</small>
     </div>
 
     <hr />
@@ -51,7 +51,7 @@
               ></textarea>
             </div>
             <button type="submit" class="btn btn-info btn-block mb-2">更新</button>
-            <small>等到位置都抓對了之後，我們就把這塊移除掉。在那之前請大家幫忙填：請注意，更新會把別人的同音字資料蓋掉！結果預覽如下：</small>
+            <small>大家可以更新字庫進來，依據如：八=1:11.4，這樣的格式來更新。同音字只要更新一次就可。等到位置都抓對了之後，我們就把這塊移除掉。在那之前請大家幫忙填：請注意，更新會把別人的同音字資料蓋掉！結果預覽如下：</small>
           </form>
           <div class="mt-2" style=" height: 300px; overflow-y: scroll;">
             <table class="table">
