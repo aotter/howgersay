@@ -4,8 +4,13 @@ const { Nuxt, Builder } = require("nuxt");
 const data = require("./wordsPosition");
 const pinyin = require("pinyin");
 const app = express();
+var bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-let wordData;
+const sampleData =
+  "八=1:11.4,拔=1:12,把=1:13,爸=1:14,播=1:15.8,博=1:16.5,跛=1:17.5,擘=1:18.3";
+let wordData = data.DATA;
 
 // Import and Set Nuxt.js options
 let config = require("../nuxt.config.js");
@@ -18,8 +23,20 @@ app.get("/api/getposition", (req, res) => {
   res.send(list);
 });
 
+app.get("/api/getcurrdata", (req, res) => {
+  res.send({ sampleData, wordData });
+});
+
+// we won't do this after all data collected
+app.post("/api/update", (req, res) => {
+  const data = req.body.data;
+  const tempData = data;
+  parseWordPositionData(tempData);
+  res.send({ wordData });
+});
+
 async function start() {
-  wordData = parseWordPositionData();
+  //parseWordPositionData(currData);
 
   // Init Nuxt.js
   const nuxt = new Nuxt(config);
@@ -45,27 +62,31 @@ async function start() {
   });
 }
 
-function parseWordPositionData() {
-  const resultDict = {};
+function parseWordPositionData(data) {
+  //const resultDict = {};
   // Load data for word position
   try {
-    const list = data.DATA;
+    const list = data;
     list.split(",").forEach(word => {
-      const ws = word.split("=");
-      const zh = ws[0];
-      const tStr = ws[1];
-      const tss = tStr.split(":");
-      const minute = parseInt(tss[0]);
-      const seconds = parseFloat(tss[1]);
-      const tSec = minute * 60 + seconds;
-      const py = pinyin(zh)[0][0];
-      resultDict[py] = tSec;
-      consola.info("load data: ", zh, py, tSec);
+      try {
+        const ws = word.split("=");
+        const zh = ws[0];
+        const tStr = ws[1];
+        const tss = tStr.split(":");
+        const minute = parseInt(tss[0]);
+        const seconds = parseFloat(tss[1]);
+        const tSec = minute * 60 + seconds;
+        const py = pinyin(zh)[0][0];
+        wordData[py] = tSec;
+        //resultDict[py] = tSec;
+      } catch (e) {
+        // ignore
+      }
     });
   } catch (e) {
     consola.warn(e);
   }
-  return resultDict;
+  //return resultDict;
 }
 
 start();

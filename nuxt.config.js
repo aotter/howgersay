@@ -39,6 +39,15 @@ module.exports = {
     "bootstrap-vue/nuxt"
   ],
 
+  buildModules: [
+    [
+      "@nuxtjs/google-analytics",
+      {
+        id: "UA-34664897-32" // this is our ga code
+      }
+    ]
+  ],
+
   /*
    ** Build configuration
    */
