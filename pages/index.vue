@@ -58,11 +58,13 @@
               <thead>
                 <tr>
                   <th>拼音</th>
+                  <th>分:秒</th>
                   <th>秒數</th>
                 </tr>
               </thead>
               <tr v-for="k in Object.keys(wordData)" :key="k">
                 <td>{{k}}</td>
+                <td>{{formatMinSec(wordData[k])}}</td>
                 <td>{{wordData[k]}}</td>
               </tr>
             </table>
@@ -109,6 +111,9 @@ export default {
     }
   },
   methods: {
+    formatMinSec(input) {
+      return `${Math.floor(input / 60)}:${Math.round((input % 60) * 10) / 10}`;
+    },
     async onUpdate() {
       const resp = await fetch("/api/update", {
         method: "POST",
