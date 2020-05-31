@@ -18,14 +18,14 @@ spec:
       imagePullSecrets:
         - name: pipeline-docker-registry
       containers:
-        name: howgersay
-        image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
-        ports:
-          - containerPort: 3000
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "256m"
-          limits:
-            memory: "1Gi"
-            cpu: "512m"
+        - name: howgersay
+          image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "256m"
+            limits:
+              memory: "1Gi"
+              cpu: "512m"
