@@ -66,6 +66,7 @@
                 <td>{{wordData[k]}}</td>
               </tr>
             </table>
+            <div style="display:none;">{{jsonData}}</div>
           </div>
         </div>
       </div>
@@ -104,7 +105,7 @@ export default {
   },
   computed: {
     jsonData() {
-      return JSON.stringify(this.wordData, null, 2);
+      return JSON.stringify(this.wordData);
     }
   },
   methods: {
@@ -117,7 +118,6 @@ export default {
         body: JSON.stringify({ data: this.data })
       });
       const rData = await resp.json();
-      //this.data = rData.currData;
       this.wordData = rData.wordData;
     },
     async onSubmit() {
@@ -144,7 +144,7 @@ export default {
   async mounted() {
     const res = await fetch("/api/getcurrdata");
     const rData = await res.json();
-    this.sampleData = rData.currData;
+    this.sampleData = rData.sampleData;
     this.wordData = rData.wordData;
   }
 };

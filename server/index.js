@@ -8,8 +8,9 @@ var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-let currData = data.DATA;
-let wordData = {};
+const sampleData =
+  "八=1:11.4,拔=1:12,把=1:13,爸=1:14,播=1:15.8,博=1:16.5,跛=1:17.5,擘=1:18.3";
+let wordData = data.DATA;
 
 // Import and Set Nuxt.js options
 let config = require("../nuxt.config.js");
@@ -23,7 +24,7 @@ app.get("/api/getposition", (req, res) => {
 });
 
 app.get("/api/getcurrdata", (req, res) => {
-  res.send({ currData, wordData });
+  res.send({ sampleData, wordData });
 });
 
 // we won't do this after all data collected
@@ -31,11 +32,11 @@ app.post("/api/update", (req, res) => {
   const data = req.body.data;
   const tempData = data;
   parseWordPositionData(tempData);
-  res.send({ currData, wordData });
+  res.send({ wordData });
 });
 
 async function start() {
-  parseWordPositionData(currData);
+  //parseWordPositionData(currData);
 
   // Init Nuxt.js
   const nuxt = new Nuxt(config);
