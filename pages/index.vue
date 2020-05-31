@@ -1,6 +1,6 @@
 <template>
-  <section>
-    <div class="container pt-5">
+  <section class="howger">
+    <div class="container">
       <div class="row">
         <div class="col text-center p-3">
             <h2>HowfunSong - 昊哥幫你念</h2>
@@ -26,6 +26,9 @@
         </div>
       </div>
     </div>
+    <div class="text-center text-secondary">
+      <small>假日不想寫作業一時興起的產物</small>
+    </div>
   </section>
 </template>
 
@@ -40,8 +43,8 @@ const VIDEO_ID = "sNcvgpUqrwE";
 let player;
 window.onYouTubePlayerAPIReady = () => {
   player = new YT.Player("ytplayer", {
-    width: 360,
-    height: 240,
+    width: 480,
+    height: 360,
     videoId: VIDEO_ID
   });
 };
@@ -82,4 +85,20 @@ export default {
 </script>
 
 <style>
+body {
+  background-color: rgba(0,0,0,.05);
+  font-size: 1.1rem;
+  font-family: Microsoft JhengHei,Helvetica Neue,Helvetica,Arial,sans-serif;
+  font-weight: 400;
+  letter-spacing: 1px;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+.howger {
+  background: #FFF;
+  padding: 30px;
+  border-radius: 4px;
+  margin-top: 2.5rem;
+}
 </style>
