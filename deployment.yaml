@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: howgersay
+  namespace: aotter
+  labels:
+    app: howgersay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: howgersay
+  template:
+    metadata:
+      labels:
+        app: howgersay
+    spec:
+      imagePullSecrets:
+        - name: pipeline-docker-registry
+      containers:
+        name: howgersay
+        image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
+        ports:
+          - containerPort: 3000
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "256m"
+          limits:
+            memory: "1Gi"
+            cpu: "512m"

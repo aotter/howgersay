@@ -1,0 +1,21 @@
+stages:
+  - name: Publish
+    steps:
+      - publishImageConfig:
+          dockerfilePath: ./Dockerfile
+          buildContext: .
+          tag: howgersay:${CICD_EXECUTION_SEQUENCE}
+        when:
+          branch:
+            include:
+              - master
+  - name: Deploy
+    steps:
+      - applyYamlConfig:
+          path: ./deployment.yaml
+        when:
+          branch:
+            include:
+              - master
+timeout: 60
+notification: {}
