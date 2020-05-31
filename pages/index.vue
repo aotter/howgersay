@@ -1,19 +1,29 @@
 <template>
   <section>
-    <div class="row">
-      <div class="col">
-        <div id="ytplayer"></div>
+    <div class="container pt-5">
+      <div class="row">
+        <div class="col text-center p-3">
+            <h2>HowfunSong - 昊哥幫你念</h2>
+            <h6 class="text-secondary">好放送，放送昊哥好祝福</h6>
+          </div>
       </div>
     </div>
     <div class="row">
-      <div class="col">
-        <form @submit.prevent="onSubmit">
-          <div class="form-group">
-            <label for="zh">輸入中文昊哥幫你念</label>
-            <textarea class="form-control" id="zh" rows="3" v-model="zh"></textarea>
+      <div class="container">        
+        <div class="d-flex justify-content-between text-center">
+          <div style="margin: 0 auto;">
+            <div id="ytplayer"></div>
           </div>
-          <button type="submit" class="btn btn-primary mb-2">請朗讀</button>
-        </form>
+        </div>
+        <div class="col text-center">
+          <form @submit.prevent="onSubmit">
+            <div class="form-group">
+              <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念</label>
+              <textarea class="form-control" id="zh" rows="3" v-model="zh"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block mb-2">請朗讀</button>
+          </form>
+        </div>
       </div>
     </div>
   </section>
