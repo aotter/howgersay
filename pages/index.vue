@@ -42,13 +42,30 @@
           <form @submit.prevent="onUpdate">
             <div class="form-group">
               <label for="zh">更新字詞位置資料</label>
-              <textarea class="form-control" id="zh" rows="3" v-model="data"></textarea>
+              <textarea
+                class="form-control"
+                id="zh"
+                rows="3"
+                v-model="data"
+                :placeholder="sampleData"
+              ></textarea>
             </div>
             <button type="submit" class="btn btn-info btn-block mb-2">更新</button>
             <small>等到位置都抓對了之後，我們就把這塊移除掉。在那之前請大家幫忙填：請注意，更新會把別人的同音字資料蓋掉！結果預覽如下：</small>
           </form>
-          <div class="mt-2">
-            <pre>{{jsonData}}</pre>
+          <div class="mt-2" style=" height: 300px; overflow-y: scroll;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>拼音</th>
+                  <th>秒數</th>
+                </tr>
+              </thead>
+              <tr v-for="k in Object.keys(wordData)" :key="k">
+                <td>{{k}}</td>
+                <td>{{wordData[k]}}</td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -81,12 +98,13 @@ export default {
     return {
       zh: "",
       data: "",
+      sampleData: "",
       wordData: {}
     };
   },
   computed: {
     jsonData() {
-      return JSON.stringify(this.wordData);
+      return JSON.stringify(this.wordData, null, 2);
     }
   },
   methods: {
@@ -99,7 +117,7 @@ export default {
         body: JSON.stringify({ data: this.data })
       });
       const rData = await resp.json();
-      this.data = rData.currData;
+      //this.data = rData.currData;
       this.wordData = rData.wordData;
     },
     async onSubmit() {
@@ -126,7 +144,7 @@ export default {
   async mounted() {
     const res = await fetch("/api/getcurrdata");
     const rData = await res.json();
-    this.data = rData.currData;
+    this.sampleData = rData.currData;
     this.wordData = rData.wordData;
   }
 };
