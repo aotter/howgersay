@@ -45,8 +45,11 @@
               <textarea class="form-control" id="zh" rows="3" v-model="data"></textarea>
             </div>
             <button type="submit" class="btn btn-info btn-block mb-2">更新</button>
-            <small>等到位置都抓對了之後，我們就把這塊移除掉。在那之前請大家幫忙填：請注意，的更新會把別人的版本蓋掉！</small>
+            <small>等到位置都抓對了之後，我們就把這塊移除掉。在那之前請大家幫忙填：請注意，更新會把別人的同音字資料蓋掉！結果預覽如下：</small>
           </form>
+          <div class="mt-2">
+            <pre>{{jsonData}}</pre>
+          </div>
         </div>
       </div>
     </div>
@@ -77,8 +80,14 @@ export default {
   data() {
     return {
       zh: "",
-      data: ""
+      data: "",
+      wordData: {}
     };
+  },
+  computed: {
+    jsonData() {
+      return JSON.stringify(this.wordData);
+    }
   },
   methods: {
     async onUpdate() {
@@ -89,7 +98,9 @@ export default {
         },
         body: JSON.stringify({ data: this.data })
       });
-      this.data = await resp.text();
+      const rData = await resp.json();
+      this.data = rData.currData;
+      this.wordData = rData.wordData;
     },
     async onSubmit() {
       const positions = await this.toPinyin(this.zh);
@@ -114,7 +125,9 @@ export default {
   },
   async mounted() {
     const res = await fetch("/api/getcurrdata");
-    this.data = await res.text();
+    const rData = await res.json();
+    this.data = rData.currData;
+    this.wordData = rData.wordData;
   }
 };
 </script>

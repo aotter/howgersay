@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 let currData = data.DATA;
-let wordData;
+let wordData = {};
 
 // Import and Set Nuxt.js options
 let config = require("../nuxt.config.js");
@@ -23,19 +23,19 @@ app.get("/api/getposition", (req, res) => {
 });
 
 app.get("/api/getcurrdata", (req, res) => {
-  res.send(currData);
+  res.send({ currData, wordData });
 });
 
 // we won't do this after all data collected
 app.post("/api/update", (req, res) => {
   const data = req.body.data;
-  currData = data;
-  wordData = parseWordPositionData();
-  res.send(currData);
+  const tempData = data;
+  parseWordPositionData(tempData);
+  res.send({ currData, wordData });
 });
 
 async function start() {
-  wordData = parseWordPositionData();
+  parseWordPositionData(currData);
 
   // Init Nuxt.js
   const nuxt = new Nuxt(config);
@@ -61,11 +61,11 @@ async function start() {
   });
 }
 
-function parseWordPositionData() {
-  const resultDict = {};
+function parseWordPositionData(data) {
+  //const resultDict = {};
   // Load data for word position
   try {
-    const list = currData;
+    const list = data;
     list.split(",").forEach(word => {
       try {
         const ws = word.split("=");
@@ -76,7 +76,8 @@ function parseWordPositionData() {
         const seconds = parseFloat(tss[1]);
         const tSec = minute * 60 + seconds;
         const py = pinyin(zh)[0][0];
-        resultDict[py] = tSec;
+        wordData[py] = tSec;
+        //resultDict[py] = tSec;
       } catch (e) {
         // ignore
       }
@@ -84,7 +85,7 @@ function parseWordPositionData() {
   } catch (e) {
     consola.warn(e);
   }
-  return resultDict;
+  //return resultDict;
 }
 
 start();
