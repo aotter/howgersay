@@ -128,7 +128,6 @@ export default {
     async onSubmit() {
       const positions = await this.toPinyin(this.zh);
       await this.say(positions);
-      player.stopVideo();
     },
     async toPinyin(zh) {
       const resp = await fetch(`/api/getposition?q=${encodeURIComponent(zh)}`);
@@ -136,7 +135,9 @@ export default {
       return j;
     },
     async playSeg(start, duration) {
+      player.pauseVideo();
       player.seekTo(start, true);
+      player.playVideo();
       await sleep(duration * 1000);
     },
     async say(positions) {
@@ -144,6 +145,7 @@ export default {
         const element = positions[i];
         await this.playSeg(element, 0.9);
       }
+      player.pauseVideo();
     }
   },
   async mounted() {
