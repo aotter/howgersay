@@ -18,7 +18,7 @@
         <div class="col text-center">
           <form @submit.prevent="onSubmit">
             <div class="form-group">
-              <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念</label>
+              <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念(第一個字容易漏唸，可以重複打一次）</label>
               <textarea class="form-control" id="zh" rows="3" v-model="zh"></textarea>
             </div>
             <button type="submit" class="btn btn-primary btn-block mb-2">請朗讀</button>
