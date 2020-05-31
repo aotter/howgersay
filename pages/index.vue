@@ -43,8 +43,8 @@ const VIDEO_ID = "sNcvgpUqrwE";
 let player;
 window.onYouTubePlayerAPIReady = () => {
   player = new YT.Player("ytplayer", {
-    width: 480,
-    height: 360,
+    width: 360,
+    height: 240,
     videoId: VIDEO_ID
   });
 };
