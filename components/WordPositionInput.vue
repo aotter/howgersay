@@ -1,13 +1,13 @@
 <template>
-  <form class="form-inline" @submit.prevent="onSubmit">
-    <label class="my-1 mr-2" for="inlineFormCustomSelectPref">{{pinyin}}</label>
+  <form class="input-group mb-3" @submit.prevent="onSubmit">
+    <label class="input-group-prepend" for="inlineFormCustomSelectPref"><span class="input-group-text">{{pinyin}}</span></label>
     <input
       type="text"
       class="form-control mb-2 mr-sm-2"
       placeholder="請輸入起始時間  e.g. 11:12.3"
       v-model="startSecStr"
     />
-    <button type="submit" class="btn btn-primary mb-2">更新單字時間</button>
+    <button type="submit" class="btn btn-dark mb-2">更新單字時間</button>
   </form>
 </template>
 <script>
