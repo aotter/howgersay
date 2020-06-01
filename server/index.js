@@ -19,7 +19,10 @@ config.dev = !(process.env.NODE_ENV === "production");
 app.get("/api/getposition", (req, res) => {
   const zh = req.query.q || "";
   const pys = pinyin(zh);
-  const list = pys.map(p => wordData[p[0]]);
+  const list = pys.map(p => {
+    const pinyin = p[0];
+    return { pinyin, startSec: wordData[pinyin], duration: 0.9 };
+  });
   res.send(list);
 });
 
@@ -29,15 +32,12 @@ app.get("/api/getcurrdata", (req, res) => {
 
 // we won't do this after all data collected
 app.post("/api/update", (req, res) => {
-  const data = req.body.data;
-  const tempData = data;
-  parseWordPositionData(tempData);
-  res.send({ wordData });
+  const { pinyin, startSec, duration } = req.body;
+  wordData[pinyin] = startSec;
+  res.send();
 });
 
 async function start() {
-  //parseWordPositionData(currData);
-
   // Init Nuxt.js
   const nuxt = new Nuxt(config);
 

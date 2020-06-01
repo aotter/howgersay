@@ -18,7 +18,7 @@
         <div class="col text-center">
           <form @submit.prevent="onSubmit">
             <div class="form-group">
-              <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念(第一個字容易漏唸，可以重複打一次）</label>
+              <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念 (第一次唸會卡卡，多念幾次就順了）</label>
               <textarea class="form-control" id="zh" rows="3" v-model="zh"></textarea>
             </div>
             <button type="submit" class="btn btn-primary btn-block mb-2">請朗讀</button>
@@ -26,52 +26,24 @@
         </div>
       </div>
     </div>
-    <div class="text-center text-secondary">
-      <small>假日不想寫作業一時興起的產物，博君一笑便民服務，影片屬How哥所有。</small>
-    </div>
-
-    <hr />
-    <div class="row">
+    <div v-if="positions.length > 0" class="row mt-4">
       <div class="container">
-        <div class="d-flex justify-content-between text-center">
-          <div style="margin: 0 auto;">
-            <div id="ytplayer"></div>
-          </div>
-        </div>
         <div class="col text-center">
-          <form @submit.prevent="onUpdate">
-            <div class="form-group">
-              <label for="zh">更新字詞位置資料</label>
-              <textarea
-                class="form-control"
-                id="zh"
-                rows="3"
-                v-model="data"
-                :placeholder="sampleData"
-              ></textarea>
-            </div>
-            <button type="submit" class="btn btn-info btn-block mb-2">更新</button>
-            <small>大家可以更新字庫進來，依據如：八=1:11.4，這樣的格式來更新。同音字只要更新一次就可。等到位置都抓對了之後，我們就把這塊移除掉。在那之前請大家幫忙填：請注意，更新會把別人的同音字資料蓋掉！結果預覽如下：</small>
-          </form>
-          <div class="mt-2" style=" height: 300px; overflow-y: scroll;">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>拼音</th>
-                  <th>分:秒</th>
-                  <th>秒數</th>
-                </tr>
-              </thead>
-              <tr v-for="k in Object.keys(wordData)" :key="k">
-                <td>{{k}}</td>
-                <td>{{formatMinSec(wordData[k])}}</td>
-                <td>{{wordData[k]}}</td>
-              </tr>
-            </table>
-            <div style="display:none;">{{jsonData}}</div>
-          </div>
+          <small>聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</small>
+          <span v-for="(p, i) in positions" :key="i">
+            <WordPositionInput
+              :pinyin="p.pinyin"
+              :start-sec="p.startSec"
+              :duration="p.duration"
+              @submit="onUpdate"
+            />
+          </span>
         </div>
       </div>
+    </div>
+    <hr />
+    <div class="text-center text-secondary">
+      <small>假日不想寫作業一時興起的產物，博君一笑便民服務，影片屬How哥所有。</small>
     </div>
   </section>
 </template>
@@ -97,12 +69,13 @@ function sleep(ms) {
 }
 
 export default {
+  components: {
+    WordPositionInput: () => import("~/components/WordPositionInput")
+  },
   data() {
     return {
       zh: "",
-      data: "",
-      sampleData: "",
-      wordData: {}
+      positions: []
     };
   },
   computed: {
@@ -114,45 +87,43 @@ export default {
     formatMinSec(input) {
       return `${Math.floor(input / 60)}:${Math.round((input % 60) * 10) / 10}`;
     },
-    async onUpdate() {
-      const resp = await fetch("/api/update", {
+    async onUpdate({ pinyin, startSec, duration }) {
+      this.positions = this.positions.map(p => {
+        if (p.pinyin === pinyin) {
+          p.startSec = startSec;
+          p.duration = duration;
+        }
+        return p;
+      });
+      await fetch("/api/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=utf-8"
         },
-        body: JSON.stringify({ data: this.data })
+        body: JSON.stringify({ pinyin, startSec, duration })
       });
-      const rData = await resp.json();
-      this.wordData = rData.wordData;
+      await this.playSeg(startSec, duration);
     },
     async onSubmit() {
-      const positions = await this.toPinyin(this.zh);
-      await this.say(positions);
-    },
-    async toPinyin(zh) {
-      const resp = await fetch(`/api/getposition?q=${encodeURIComponent(zh)}`);
-      const j = await resp.json();
-      return j;
+      const resp = await fetch(
+        `/api/getposition?q=${encodeURIComponent(this.zh)}`
+      );
+      this.positions = await resp.json();
+      await this.say();
     },
     async playSeg(start, duration) {
       player.pauseVideo();
       player.seekTo(start, true);
       player.playVideo();
       await sleep(duration * 1000);
-    },
-    async say(positions) {
-      for (let i = 0; i < positions.length; i++) {
-        const element = positions[i];
-        await this.playSeg(element, 0.9);
-      }
       player.pauseVideo();
+    },
+    async say() {
+      for (let i = 0; i < this.positions.length; i++) {
+        const word = this.positions[i];
+        await this.playSeg(word.startSec, word.duration);
+      }
     }
-  },
-  async mounted() {
-    const res = await fetch("/api/getcurrdata");
-    const rData = await res.json();
-    this.sampleData = rData.sampleData;
-    this.wordData = rData.wordData;
   }
 };
 </script>
