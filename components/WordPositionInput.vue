@@ -1,6 +1,8 @@
 <template>
   <form class="input-group mb-3" @submit.prevent="onSubmit">
-    <label class="input-group-prepend" for="inlineFormCustomSelectPref"><span class="input-group-text">{{pinyin}}</span></label>
+    <label class="input-group-prepend" for="inlineFormCustomSelectPref">
+      <span class="input-group-text">{{pinyin}}</span>
+    </label>
     <input
       type="text"
       class="form-control mb-2 mr-sm-2"
@@ -21,9 +23,11 @@ export default {
   computed: {
     startSecStr: {
       get() {
-        return `${Math.floor(this.startSec / 60)}:${Math.round(
-          (this.startSec % 60) * 10
-        ) / 10}`;
+        return this.startSec
+          ? `${Math.floor(this.startSec / 60)}:${Math.round(
+              (this.startSec % 60) * 10
+            ) / 10}`
+          : "";
       },
       set(val) {
         const tss = val.split(":");
@@ -34,9 +38,6 @@ export default {
     }
   },
   methods: {
-    formatMinSec(input) {
-      return `${Math.floor(input / 60)}:${Math.round((input % 60) * 10) / 10}`;
-    },
     onSubmit() {
       this.$emit("submit", {
         pinyin: this.pinyin,

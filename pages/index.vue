@@ -26,25 +26,31 @@
         </div>
       </div>
     </div>
-    <div v-if="positions.length > 0" class="row mt-4">
-        <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
-          <div class="container">
-            <div class="col text-center p-3">
-              <h6 class="mb-3">聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</h6>
-              <span v-for="(p, i) in positions" :key="i">
-                <WordPositionInput
-                  :pinyin="p.pinyin"
-                  :start-sec="p.startSec"
-                  :duration="p.duration"
-                  @submit="onUpdate"
-                />
-              </span>
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
+    <div v-if="positions.length > 0 && showEditArea" class="row mt-4">
+      <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
+        <div class="container">
+          <div class="col text-center p-3">
+            <h6 class="mb-3">聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</h6>
+            <span v-for="(p, i) in positions" :key="i">
+              <WordPositionInput
+                :pinyin="p.pinyin"
+                :start-sec="p.startSec"
+                :duration="p.duration"
+                @submit="onUpdate"
+              />
+            </span>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="alert"
+              aria-label="Close"
+              @click.prevent="showEditArea = false"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
         </div>
+      </div>
     </div>
     <hr />
     <div class="text-center text-secondary">
@@ -79,6 +85,7 @@ export default {
   },
   data() {
     return {
+      showEditArea: false,
       zh: "",
       positions: []
     };
@@ -109,6 +116,7 @@ export default {
         `/api/getposition?q=${encodeURIComponent(this.zh)}`
       );
       this.positions = await resp.json();
+      this.showEditArea = true;
       await this.say();
     },
     async playSeg(start, duration) {
