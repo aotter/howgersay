@@ -27,14 +27,14 @@ app.get("/api/getposition", (req, res) => {
 });
 
 app.get("/api/getcurrdata", (req, res) => {
-  res.send({ sampleData, wordData });
+  res.send({ wordData });
 });
 
 // we won't do this after all data collected
 app.post("/api/update", (req, res) => {
   const { pinyin, startSec, duration } = req.body;
   wordData[pinyin] = startSec;
-  res.send();
+  res.send({ wordData });
 });
 
 async function start() {

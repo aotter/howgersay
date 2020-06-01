@@ -49,6 +49,7 @@
     <hr />
     <div class="text-center text-secondary">
       <small>假日不想寫作業一時興起的產物，博君一笑便民服務，影片屬How哥所有。</small>
+      <div style="display:none">{{jsonData}}</div>
     </div>
   </section>
 </template>
@@ -80,6 +81,7 @@ export default {
   data() {
     return {
       zh: "",
+      wordData: {},
       positions: []
     };
   },
@@ -129,6 +131,11 @@ export default {
         await this.playSeg(word.startSec, word.duration);
       }
     }
+  },
+  async mounted() {
+    const res = await fetch("/api/getcurrdata");
+    const rData = await res.json();
+    this.wordData = rData.wordData;
   }
 };
 </script>
