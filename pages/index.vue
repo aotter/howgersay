@@ -13,14 +13,24 @@
       <div class="row">
         <div class="container">
           <div class="d-flex justify-content-between text-center">
-            <div style="margin: 0 auto;">
+            <div style="margin: 0 auto;" :style="{opacity: buffering? '0.1':'1'}">
               <div id="ytplayer"></div>
             </div>
           </div>
           <div class="col text-center">
+            <div class="progress" v-if="buffering">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                :style="`width: ${bufferedPercent}%;`"
+                :aria-valuenow="bufferedPercent"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >昊哥練習中</div>
+            </div>
             <form @submit.prevent="onSubmit">
               <div class="form-group">
-                <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念 (第一次唸會卡卡，多念幾次就順了）</label>
+                <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念</label>
                 <textarea class="form-control" id="zh" rows="3" v-model="zh"></textarea>
               </div>
               <button type="submit" class="btn btn-primary btn-block mb-2" :disabled="saying">請朗讀</button>
@@ -118,6 +128,8 @@ export default {
   },
   data() {
     return {
+      buffering: false,
+      buffered: 0,
       player: null,
       audit: false,
       saying: false,
@@ -126,6 +138,11 @@ export default {
       positions: [],
       all_positions: []
     };
+  },
+  computed: {
+    bufferedPercent() {
+      return (this.buffered / (this.positions.length * 2)) * 100;
+    }
   },
   methods: {
     shareOnFb() {
@@ -209,6 +226,21 @@ export default {
       await sleep(duration * 1000);
     },
     async say() {
+      this.buffering = true;
+      this.buffered = 0;
+      this.player.mute();
+      for (let i = 0; i < this.positions.length; i++) {
+        const word = this.positions[i];
+        await this.playSeg(word.startSec, word.duration);
+        this.buffered++;
+      }
+      for (let i = 0; i < this.positions.length; i++) {
+        const word = this.positions[i];
+        await this.playSeg(word.startSec, word.duration);
+        this.buffered++;
+      }
+      this.buffering = false;
+      this.player.unMute();
       for (let i = 0; i < this.positions.length; i++) {
         const word = this.positions[i];
         await this.playSeg(word.startSec, word.duration);
