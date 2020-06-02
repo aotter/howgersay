@@ -9,12 +9,12 @@
       placeholder="請輸入起始時間  e.g. 11:12.3"
       v-model="startSecStr"
     />
-    <button type="submit" class="btn btn-dark mb-2">更新單字時間</button>
+    <button type="submit" class="btn btn-dark mb-2" :disabled="saying">更新單字時間</button>
   </form>
 </template>
 <script>
 export default {
-  props: ["pinyin", "startSec", "duration"],
+  props: ["pinyin", "startSec", "duration", "saying"],
   data() {
     return {
       tSec: 0
