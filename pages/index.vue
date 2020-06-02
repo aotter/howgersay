@@ -1,118 +1,125 @@
 <template>
   <section class="howger">
-    <div class="container">
-      <div class="row">
-        <div class="col text-center p-3">
-          <h2>HowfunSong - 昊哥幫你念</h2>
-          <h6 class="text-secondary">好放送，放送昊哥好祝福</h6>
-        </div>
-      </div>
-    </div>
-    <div class="row">
+    <no-ssr>
       <div class="container">
-        <div class="d-flex justify-content-between text-center">
-          <div style="margin: 0 auto;">
-            <div id="ytplayer"></div>
+        <div class="row">
+          <div class="col text-center p-3">
+            <h2>HowfunSong - 昊哥幫你念</h2>
+            <h6 class="text-secondary">好放送，放送昊哥好祝福</h6>
+            <h6 class="text-secondary">手機上可能會怪怪的</h6>
           </div>
         </div>
-        <div class="col text-center">
-          <form @submit.prevent="onSubmit">
-            <div class="form-group">
-              <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念 (第一次唸會卡卡，多念幾次就順了）</label>
-              <textarea class="form-control" id="zh" rows="3" v-model="zh"></textarea>
+      </div>
+      <div class="row">
+        <div class="container">
+          <div class="d-flex justify-content-between text-center">
+            <div style="margin: 0 auto;">
+              <div id="ytplayer"></div>
             </div>
-            <button type="submit" class="btn btn-primary btn-block mb-2" :disabled="saying">請朗讀</button>
-          </form>
-        </div>
-      </div>
-    </div>
-    <!-- <div v-if="positions.length > 0 && showEditArea" class="row mt-4">
-      <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
-        <div class="container">
-          <div class="col text-center p-3">
-            <h6 class="mb-3">聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</h6>
-            <span v-for="(p, i) in positions" :key="i">
-              <WordPositionInput
-                :pinyin="p.pinyin"
-                :start-sec="p.startSec"
-                :duration="p.duration"
-                :saying="saying"
-                @submit="onUpdate"
-              />
-            </span>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="alert"
-              aria-label="Close"
-              @click.prevent="showEditArea = false"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+          </div>
+          <div class="col text-center">
+            <form @submit.prevent="onSubmit">
+              <div class="form-group">
+                <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念 (第一次唸會卡卡，多念幾次就順了）</label>
+                <textarea class="form-control" id="zh" rows="3" v-model="zh"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block mb-2" :disabled="saying">請朗讀</button>
+            </form>
+            <button @click.prevent="shareOnFb" class="btn btn-info">分享到臉書</button>
           </div>
         </div>
       </div>
-    </div>-->
-    <div class="row mt-4" v-if="audit">
-      <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
-        <div class="container">
-          <div class="col text-center p-3">
-            <h6 class="mb-3">聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</h6>
-            <span v-for="(p, i) in all_positions" :key="i">
-              <WordPositionInput
-                :pinyin="p.pinyin"
-                :start-sec="p.startSec"
-                :duration="p.duration"
-                :saying="saying"
-                @submit="onUpdate"
-              />
-            </span>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="alert"
-              aria-label="Close"
-              @click.prevent="showEditArea = false"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+      <div v-if="positions.length > 0 && showEditArea" class="row mt-4">
+        <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
+          <div class="container">
+            <div class="col text-center p-3">
+              <h6 class="mb-3">聽起來怪怪的？輸入更精確的時間就可以修正囉（秒可以有小數點呦！）</h6>
+              <span v-for="(p, i) in positions" :key="i">
+                <WordPositionInput
+                  :pinyin="p.pinyin"
+                  :start-sec="p.startSec"
+                  :duration="p.duration"
+                  :saying="saying"
+                  @submit="onSoftUpdate"
+                />
+              </span>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="alert"
+                aria-label="Close"
+                @click.prevent="showEditArea = false"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <hr />
-    <div class="text-center text-secondary">
-      <small>假日不想寫作業一時興起的產物，博君一笑便民服務，影片屬How哥所有。</small>
-    </div>
+      <div class="row mt-4" v-if="audit">
+        <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
+          <div class="container">
+            <div class="col text-center p-3">
+              <h6 class="mb-3">聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</h6>
+              <span v-for="(p, i) in all_positions" :key="i">
+                <WordPositionInput
+                  :pinyin="p.pinyin"
+                  :start-sec="p.startSec"
+                  :duration="p.duration"
+                  :saying="saying"
+                  @submit="onUpdate"
+                />
+              </span>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="alert"
+                aria-label="Close"
+                @click.prevent="showEditArea = false"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div class="text-center text-secondary">
+        <small>假日不想寫作業一時興起的產物，博君一笑便民服務，影片屬How哥所有。</small>
+      </div>
+    </no-ssr>
   </section>
 </template>
 
 <script>
-const tag = document.createElement("script");
-tag.src = "https://www.youtube.com/player_api";
-const firstScriptTag = document.getElementsByTagName("script")[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-const VIDEO_ID = "sNcvgpUqrwE";
-
-let player;
-window.onYouTubePlayerAPIReady = () => {
-  player = new YT.Player("ytplayer", {
-    width: 360,
-    height: 240,
-    videoId: VIDEO_ID
-  });
-};
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export default {
+  asyncData({ req }) {
+    const { zh, audit } = req.query;
+    return { zh, audit };
+  },
+  head() {
+    return {
+      title: `昊哥說：${this.zh}`,
+      meta: [
+        { property: "description", content: "昊哥幫你念任何句子" },
+        { property: "og:title", content: `昊哥說：${this.zh}` },
+        {
+          property: "og:image",
+          content: "https://i.ytimg.com/vi/sNcvgpUqrwE/maxresdefault.jpg"
+        }
+      ]
+    };
+  },
   components: {
     WordPositionInput: () => import("~/components/WordPositionInput")
   },
   data() {
     return {
+      player: null,
       audit: false,
       saying: false,
       showEditArea: false,
@@ -122,17 +129,36 @@ export default {
     };
   },
   methods: {
+    shareOnFb() {
+      const share = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        "https://lab.howgersay.aotter.net" + this.$route.fullPath
+      )}`;
+      window.open(share);
+    },
     formatMinSec(input) {
       return `${Math.floor(input / 60)}:${Math.round((input % 60) * 10) / 10}`;
     },
+    appendToQuery() {
+      const qp = this.positions.map(p => {
+        return { p: p.pinyin, s: p.startSec };
+      });
+      const q = JSON.stringify({ p: qp });
+      this.$router.push({ query: { q, zh: this.zh } });
+    },
+    async onSoftUpdate({ pinyin, startSec, duration }) {
+      this.positions = this.positions.map(p => {
+        if (p.pinyin === pinyin) {
+          p.startSec = startSec;
+          p.duration = duration;
+        }
+        return p;
+      });
+      this.appendToQuery();
+      await this.playSeg(startSec, duration);
+      this.player.pauseVideo();
+    },
+    // audit mode only
     async onUpdate({ pinyin, startSec, duration }) {
-      // this.positions = this.positions.map(p => {
-      //   if (p.pinyin === pinyin) {
-      //     p.startSec = startSec;
-      //     p.duration = duration;
-      //   }
-      //   return p;
-      // });
       await fetch("/api/update", {
         method: "POST",
         headers: {
@@ -141,14 +167,34 @@ export default {
         body: JSON.stringify({ pinyin, startSec, duration })
       });
       await this.playSeg(startSec, duration);
-      player.pauseVideo();
+      this.player.pauseVideo();
     },
     async onSubmit() {
-      this.positions = [];
+      const jsonStr = this.$route.query.q;
+      let queryPositionsDict = {};
+      if (jsonStr) {
+        try {
+          JSON.parse(jsonStr).p.forEach(po => {
+            queryPositionsDict[po.p] = po.s;
+          });
+        } catch (e) {
+          // ignore
+        }
+      }
       const resp = await fetch(
         `/api/getposition?q=${encodeURIComponent(this.zh)}`
       );
-      this.positions = await resp.json();
+      const serverPositions = await resp.json();
+      this.positions = serverPositions.map(p => {
+        const queryPosStartSec = queryPositionsDict[p.pinyin];
+        if (queryPosStartSec) {
+          p.startSec = queryPosStartSec;
+        }
+        return p;
+      });
+
+      this.appendToQuery();
+
       this.showEditArea = true;
       this.saying = true;
       await this.say();
@@ -156,10 +202,10 @@ export default {
     },
     async playSeg(start, duration) {
       if (start) {
-        player.seekTo(start, true);
-        player.playVideo();
+        this.player.seekTo(start, true);
+        this.player.playVideo();
       } else {
-        player.pauseVideo();
+        this.player.pauseVideo();
       }
       await sleep(duration * 1000);
     },
@@ -168,19 +214,35 @@ export default {
         const word = this.positions[i];
         await this.playSeg(word.startSec, word.duration);
       }
-      player.pauseVideo();
+      this.player.pauseVideo();
     }
   },
   async mounted() {
-    this.audit = this.$route.query.audit;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/player_api";
+    const firstScriptTag = document.getElementsByTagName("script")[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    const VIDEO_ID = "sNcvgpUqrwE";
+
+    window.onYouTubePlayerAPIReady = () => {
+      this.player = new YT.Player("ytplayer", {
+        width: 360,
+        height: 240,
+        videoId: VIDEO_ID
+      });
+    };
+
     // remove after audit over
-    const resp = await fetch(`/api/getcurrdata`);
-    const { wordData } = await resp.json();
-    this.all_positions = Object.keys(wordData)
-      .map(k => {
-        return { pinyin: k, startSec: wordData[k], duration: 0.7 };
-      })
-      .sort((a, b) => a.startSec - b.startSec);
+    if (this.audit) {
+      const resp = await fetch(`/api/getcurrdata`);
+      const { wordData } = await resp.json();
+      this.all_positions = Object.keys(wordData)
+        .map(k => {
+          return { pinyin: k, startSec: wordData[k], duration: 0.7 };
+        })
+        .sort((a, b) => a.startSec - b.startSec);
+    }
   }
 };
 </script>
