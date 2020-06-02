@@ -1,7 +1,7 @@
 {
   "name": "howgersay",
   "version": "1.0.0",
-  "description": "My polished Nuxt.js project",
+  "description": "昊哥幫你念任何句子",
   "author": "guyspy",
   "private": true,
   "scripts": {

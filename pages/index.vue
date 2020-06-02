@@ -103,9 +103,8 @@ export default {
   },
   head() {
     return {
-      title: `昊哥說：${this.zh}`,
+      title: this.zh ? `昊哥說：${this.zh}` : "HowfunSong - 昊哥幫你念",
       meta: [
-        { property: "description", content: "昊哥幫你念任何句子" },
         { property: "og:title", content: `昊哥說：${this.zh}` },
         {
           property: "og:image",
