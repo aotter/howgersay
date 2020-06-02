@@ -26,12 +26,39 @@
         </div>
       </div>
     </div>
-    <div v-if="positions.length > 0 && showEditArea" class="row mt-4">
+    <!-- <div v-if="positions.length > 0 && showEditArea" class="row mt-4">
       <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
         <div class="container">
           <div class="col text-center p-3">
             <h6 class="mb-3">聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</h6>
             <span v-for="(p, i) in positions" :key="i">
+              <WordPositionInput
+                :pinyin="p.pinyin"
+                :start-sec="p.startSec"
+                :duration="p.duration"
+                :saying="saying"
+                @submit="onUpdate"
+              />
+            </span>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="alert"
+              aria-label="Close"
+              @click.prevent="showEditArea = false"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>-->
+    <div class="row mt-4" v-if="audit">
+      <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
+        <div class="container">
+          <div class="col text-center p-3">
+            <h6 class="mb-3">聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</h6>
+            <span v-for="(p, i) in all_positions" :key="i">
               <WordPositionInput
                 :pinyin="p.pinyin"
                 :start-sec="p.startSec"
@@ -86,10 +113,12 @@ export default {
   },
   data() {
     return {
+      audit: false,
       saying: false,
       showEditArea: false,
       zh: "",
-      positions: []
+      positions: [],
+      all_positions: []
     };
   },
   methods: {
@@ -97,13 +126,13 @@ export default {
       return `${Math.floor(input / 60)}:${Math.round((input % 60) * 10) / 10}`;
     },
     async onUpdate({ pinyin, startSec, duration }) {
-      this.positions = this.positions.map(p => {
-        if (p.pinyin === pinyin) {
-          p.startSec = startSec;
-          p.duration = duration;
-        }
-        return p;
-      });
+      // this.positions = this.positions.map(p => {
+      //   if (p.pinyin === pinyin) {
+      //     p.startSec = startSec;
+      //     p.duration = duration;
+      //   }
+      //   return p;
+      // });
       await fetch("/api/update", {
         method: "POST",
         headers: {
@@ -115,6 +144,7 @@ export default {
       player.pauseVideo();
     },
     async onSubmit() {
+      this.positions = [];
       const resp = await fetch(
         `/api/getposition?q=${encodeURIComponent(this.zh)}`
       );
@@ -140,6 +170,17 @@ export default {
       }
       player.pauseVideo();
     }
+  },
+  async mounted() {
+    this.audit = this.$route.query.audit;
+    // remove after audit over
+    const resp = await fetch(`/api/getcurrdata`);
+    const { wordData } = await resp.json();
+    this.all_positions = Object.keys(wordData)
+      .map(k => {
+        return { pinyin: k, startSec: wordData[k], duration: 0.7 };
+      })
+      .sort((a, b) => a.startSec - b.startSec);
   }
 };
 </script>
