@@ -21,7 +21,7 @@
               <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念 (第一次唸會卡卡，多念幾次就順了）</label>
               <textarea class="form-control" id="zh" rows="3" v-model="zh"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-block mb-2">請朗讀</button>
+            <button type="submit" class="btn btn-primary btn-block mb-2" :disabled="saying">請朗讀</button>
           </form>
         </div>
       </div>
@@ -36,6 +36,7 @@
                 :pinyin="p.pinyin"
                 :start-sec="p.startSec"
                 :duration="p.duration"
+                :saying="saying"
                 @submit="onUpdate"
               />
             </span>
@@ -85,6 +86,7 @@ export default {
   },
   data() {
     return {
+      saying: false,
       showEditArea: false,
       zh: "",
       positions: []
@@ -110,6 +112,7 @@ export default {
         body: JSON.stringify({ pinyin, startSec, duration })
       });
       await this.playSeg(startSec, duration);
+      player.pauseVideo();
     },
     async onSubmit() {
       const resp = await fetch(
@@ -117,20 +120,25 @@ export default {
       );
       this.positions = await resp.json();
       this.showEditArea = true;
+      this.saying = true;
       await this.say();
+      this.saying = false;
     },
     async playSeg(start, duration) {
-      player.pauseVideo();
-      player.seekTo(start, true);
-      player.playVideo();
+      if (start) {
+        player.seekTo(start, true);
+        player.playVideo();
+      } else {
+        player.pauseVideo();
+      }
       await sleep(duration * 1000);
-      player.pauseVideo();
     },
     async say() {
       for (let i = 0; i < this.positions.length; i++) {
         const word = this.positions[i];
         await this.playSeg(word.startSec, word.duration);
       }
+      player.pauseVideo();
     }
   }
 };
