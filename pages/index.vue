@@ -186,6 +186,7 @@ export default {
       this.player.pauseVideo();
     },
     async onSubmit() {
+      this.positions = [];
       const jsonStr = this.$route.query.q;
       let queryPositionsDict = {};
       if (jsonStr) {
