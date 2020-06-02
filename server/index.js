@@ -21,7 +21,7 @@ app.get("/api/getposition", (req, res) => {
   const pys = pinyin(zh);
   const list = pys.map(p => {
     const pinyin = p[0];
-    return { pinyin, startSec: wordData[pinyin], duration: 0.9 };
+    return { pinyin, startSec: wordData[pinyin], duration: 0.7 };
   });
   res.send(list);
 });

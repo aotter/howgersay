@@ -21,12 +21,12 @@
               <label for="zh">在下方文字框中輸入中文，讓昊哥幫你念 (第一次唸會卡卡，多念幾次就順了）</label>
               <textarea class="form-control" id="zh" rows="3" v-model="zh"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-block mb-2">請朗讀</button>
+            <button type="submit" class="btn btn-primary btn-block mb-2" :disabled="saying">請朗讀</button>
           </form>
         </div>
       </div>
     </div>
-    <div v-if="positions.length > 0 && showEditArea" class="row mt-4">
+    <!-- <div v-if="positions.length > 0 && showEditArea" class="row mt-4">
       <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
         <div class="container">
           <div class="col text-center p-3">
@@ -36,6 +36,34 @@
                 :pinyin="p.pinyin"
                 :start-sec="p.startSec"
                 :duration="p.duration"
+                :saying="saying"
+                @submit="onUpdate"
+              />
+            </span>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="alert"
+              aria-label="Close"
+              @click.prevent="showEditArea = false"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>-->
+    <div class="row mt-4" v-if="audit">
+      <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
+        <div class="container">
+          <div class="col text-center p-3">
+            <h6 class="mb-3">聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</h6>
+            <span v-for="(p, i) in all_positions" :key="i">
+              <WordPositionInput
+                :pinyin="p.pinyin"
+                :start-sec="p.startSec"
+                :duration="p.duration"
+                :saying="saying"
                 @submit="onUpdate"
               />
             </span>
@@ -85,9 +113,12 @@ export default {
   },
   data() {
     return {
+      audit: false,
+      saying: false,
       showEditArea: false,
       zh: "",
-      positions: []
+      positions: [],
+      all_positions: []
     };
   },
   methods: {
@@ -95,13 +126,13 @@ export default {
       return `${Math.floor(input / 60)}:${Math.round((input % 60) * 10) / 10}`;
     },
     async onUpdate({ pinyin, startSec, duration }) {
-      this.positions = this.positions.map(p => {
-        if (p.pinyin === pinyin) {
-          p.startSec = startSec;
-          p.duration = duration;
-        }
-        return p;
-      });
+      // this.positions = this.positions.map(p => {
+      //   if (p.pinyin === pinyin) {
+      //     p.startSec = startSec;
+      //     p.duration = duration;
+      //   }
+      //   return p;
+      // });
       await fetch("/api/update", {
         method: "POST",
         headers: {
@@ -110,28 +141,46 @@ export default {
         body: JSON.stringify({ pinyin, startSec, duration })
       });
       await this.playSeg(startSec, duration);
+      player.pauseVideo();
     },
     async onSubmit() {
+      this.positions = [];
       const resp = await fetch(
         `/api/getposition?q=${encodeURIComponent(this.zh)}`
       );
       this.positions = await resp.json();
       this.showEditArea = true;
+      this.saying = true;
       await this.say();
+      this.saying = false;
     },
     async playSeg(start, duration) {
-      player.pauseVideo();
-      player.seekTo(start, true);
-      player.playVideo();
+      if (start) {
+        player.seekTo(start, true);
+        player.playVideo();
+      } else {
+        player.pauseVideo();
+      }
       await sleep(duration * 1000);
-      player.pauseVideo();
     },
     async say() {
       for (let i = 0; i < this.positions.length; i++) {
         const word = this.positions[i];
         await this.playSeg(word.startSec, word.duration);
       }
+      player.pauseVideo();
     }
+  },
+  async mounted() {
+    this.audit = this.$route.query.audit;
+    // remove after audit over
+    const resp = await fetch(`/api/getcurrdata`);
+    const { wordData } = await resp.json();
+    this.all_positions = Object.keys(wordData)
+      .map(k => {
+        return { pinyin: k, startSec: wordData[k], duration: 0.7 };
+      })
+      .sort((a, b) => a.startSec - b.startSec);
   }
 };
 </script>
