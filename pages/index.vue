@@ -12,9 +12,15 @@
       </div>
       <div class="row">
         <div class="container">
-          <div class="d-flex justify-content-between text-center">
-            <div style="margin: 0 auto;" :style="{opacity: buffering? '0.1':'1'}">
-              <div id="ytplayer"></div>
+          <div class="d-flex justify-content-center text-center">
+            <div class="col-md-6 col-xs-12">
+              <div
+                class="embed-responsive embed-responsive-16by9"
+                style="margin: 0 auto;"
+                :style="{opacity: buffering? '0.1':'1'}"
+              >
+                <div id="ytplayer" class="embed-responsive-item"></div>
+              </div>
             </div>
           </div>
           <div class="col text-center">
