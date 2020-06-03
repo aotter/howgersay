@@ -96,6 +96,9 @@
       <hr />
       <div class="text-center text-secondary">
         <small>假日不想寫作業一時興起的產物，博君一笑便民服務，影片屬How哥所有。</small>
+        <small>
+          <a href="https://github.com/aotter/howgersay" target="_blank">GitHub</a>
+        </small>
       </div>
     </no-ssr>
   </section>
