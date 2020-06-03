@@ -115,10 +115,11 @@ export default {
     return { zh, audit };
   },
   head() {
+    const title = this.zh ? `昊哥說：${this.zh}` : "HowfunSong - 昊哥幫你念";
     return {
-      title: this.zh ? `昊哥說：${this.zh}` : "HowfunSong - 昊哥幫你念",
+      title,
       meta: [
-        { property: "og:title", content: `昊哥說：${this.zh}` },
+        { property: "og:title", content: title },
         {
           property: "og:image",
           content: "https://i.ytimg.com/vi/sNcvgpUqrwE/maxresdefault.jpg"
