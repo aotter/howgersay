@@ -3,25 +3,40 @@ const consola = require("consola");
 const { Nuxt, Builder } = require("nuxt");
 const data = require("./wordsPosition");
 const pinyin = require("pinyin");
+
+const fs = require("fs");
+const path = require("path");
+const parse = require("csv-parse");
+const getStream = require("get-stream");
+
 const app = express();
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const sampleData =
-  "八=1:11.4,拔=1:12,把=1:13,爸=1:14,播=1:15.8,博=1:16.5,跛=1:17.5,擘=1:18.3";
 let wordData = data.DATA;
+let wordData_csv = {};
 
 // Import and Set Nuxt.js options
 let config = require("../nuxt.config.js");
 config.dev = !(process.env.NODE_ENV === "production");
 
+// app.get("/api/getposition", (req, res) => {
+//   const zh = req.query.q || "";
+//   const pys = pinyin(zh);
+//   const list = pys.map(p => {
+//     const pinyin = p[0];
+//     return { pinyin, startSec: wordData[pinyin], duration: 0.8 };
+//   });
+//   res.send(list);
+// });
+
 app.get("/api/getposition", (req, res) => {
   const zh = req.query.q || "";
-  const pys = pinyin(zh);
+  const pys = pinyin(zh, { style: pinyin.STYLE_TONE2 });
   const list = pys.map(p => {
     const pinyin = p[0];
-    return { pinyin, startSec: wordData[pinyin], duration: 0.8 };
+    return { pinyin, startSec: wordData_csv[pinyin], duration: 0.8 };
   });
   res.send(list);
 });
@@ -51,6 +66,8 @@ async function start() {
     await nuxt.ready();
   }
 
+  await loadWordPositionDataFromCsv();
+
   // Give nuxt middleware to express
   app.use(nuxt.render);
 
@@ -62,31 +79,21 @@ async function start() {
   });
 }
 
-function parseWordPositionData(data) {
-  //const resultDict = {};
-  // Load data for word position
-  try {
-    const list = data;
-    list.split(",").forEach(word => {
-      try {
-        const ws = word.split("=");
-        const zh = ws[0];
-        const tStr = ws[1];
-        const tss = tStr.split(":");
-        const minute = parseInt(tss[0]);
-        const seconds = parseFloat(tss[1]);
-        const tSec = minute * 60 + seconds;
-        const py = pinyin(zh)[0][0];
-        wordData[py] = tSec;
-        //resultDict[py] = tSec;
-      } catch (e) {
-        // ignore
-      }
-    });
-  } catch (e) {
-    consola.warn(e);
+const readCSVData = async filePath =>
+  await getStream.array(
+    fs
+      .createReadStream(
+        path.join(__dirname, ".", "HowHow 發音標註眾包 - 發音表.csv")
+      )
+      .pipe(parse({ delimiter: "," }))
+  );
+async function loadWordPositionDataFromCsv() {
+  for (let [pinyin, startTime, endTime] of await readCSVData(
+    "HowHow 發音標註眾包 - 發音表.csv"
+  )) {
+    wordData_csv[pinyin] = startTime;
+    //console.log(pinyin, startTime, endTime);
   }
-  //return resultDict;
 }
 
 start();
