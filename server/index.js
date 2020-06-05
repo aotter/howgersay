@@ -6,7 +6,8 @@ const pinyin = require("pinyin");
 
 const fs = require("fs");
 const path = require("path");
-const parse = require("csv-parse");
+const csvParse = require("csv-parse");
+const json2csv = require("json2csv");
 const getStream = require("get-stream");
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(bodyParser.json());
 
 let wordData = data.DATA;
 let wordData_csv = {};
+let reportedData = [];
 
 // Import and Set Nuxt.js options
 let config = require("../nuxt.config.js");
@@ -41,8 +43,18 @@ app.get("/api/getposition", (req, res) => {
   res.send(list);
 });
 
-app.get("/api/getcurrdata", (req, res) => {
-  res.send({ wordData });
+app.get("/api/getreportedcsv", (req, res) => {
+  const data = json2csv.parse(reportedData, {
+    fields: ["pinyin", "startSec"]
+  });
+  res.attachment("reported.csv");
+  res.status(200).send(data);
+});
+
+app.post("/api/report", (req, res) => {
+  const { pinyin, startSec, duration } = req.body;
+  reportedData.push({ pinyin, startSec, duration });
+  res.send({});
 });
 
 // we won't do this after all data collected
@@ -79,20 +91,22 @@ async function start() {
   });
 }
 
+/**
+ * courtesy of https://github.com/EarlySpringCommitee/HowHow-parser
+ */
 const readCSVData = async filePath =>
   await getStream.array(
     fs
       .createReadStream(
         path.join(__dirname, ".", "HowHow 發音標註眾包 - 發音表.csv")
       )
-      .pipe(parse({ delimiter: "," }))
+      .pipe(csvParse({ delimiter: "," }))
   );
 async function loadWordPositionDataFromCsv() {
   for (let [pinyin, startTime, endTime] of await readCSVData(
     "HowHow 發音標註眾包 - 發音表.csv"
   )) {
     wordData_csv[pinyin] = startTime;
-    //console.log(pinyin, startTime, endTime);
   }
 }
 
