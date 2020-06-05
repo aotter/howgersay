@@ -34,7 +34,8 @@ config.dev = !(process.env.NODE_ENV === "production");
 // });
 
 app.get("/api/getposition", (req, res) => {
-  const zh = req.query.q || "";
+  let zh = req.query.q || "";
+  zh = zh.replace("獺", "ta4");
   const pys = pinyin(zh, { style: pinyin.STYLE_TONE2 });
   const list = pys.map(p => {
     let pinyin = p[0];
