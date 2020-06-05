@@ -12,6 +12,7 @@
 - 用 Nuxt.js 寫的
 - ~~很多 bug~~ bug 有越來越少
 - 手機上尚無法正常運行
+- 感謝 [HowHow-parser](https://github.com/EarlySpringCommitee/HowHow-parser) 貢獻更精準的發音表
 - 感謝漢字轉拼音專案 [https://github.com/hotoo/pinyin](https://github.com/hotoo/pinyin)
 - server/wordsPosition.js 這裡請大家照範例格式貢獻資料。秒數可以出現小數點做細調
 - `.rancher-pipeline.yml` 是我用的 CI/CD tool 可以不用管它

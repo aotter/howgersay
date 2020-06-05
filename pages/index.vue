@@ -50,6 +50,7 @@
           <div class="container">
             <div class="col text-center p-3">
               <h6 class="mb-3">聽起來怪怪的？輸入更精確的時間就可以修正囉（秒可以有小數點呦！）</h6>
+              <small class="mb-3">調整完後聽起來正常了，也請按下「回報更新」讓我們知道呦</small>
               <span v-for="(p, i) in positions" :key="i">
                 <WordPositionInput
                   :pinyin="p.pinyin"
@@ -57,33 +58,6 @@
                   :duration="p.duration"
                   :saying="saying"
                   @submit="onSoftUpdate"
-                />
-              </span>
-              <button
-                type="button"
-                class="close"
-                data-dismiss="alert"
-                aria-label="Close"
-                @click.prevent="showEditArea = false"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row mt-4" v-if="audit">
-        <div class="alert alert-secondary alert-dismissible alert-tips fade show" role="alert">
-          <div class="container">
-            <div class="col text-center p-3">
-              <h6 class="mb-3">聽起來怪怪的？請幫我們輸入更精確的時間（秒可以有小數點呦！）</h6>
-              <span v-for="(p, i) in all_positions" :key="i">
-                <WordPositionInput
-                  :pinyin="p.pinyin"
-                  :start-sec="p.startSec"
-                  :duration="p.duration"
-                  :saying="saying"
-                  @submit="onUpdate"
                 />
               </span>
               <button
@@ -117,8 +91,8 @@ function sleep(ms) {
 
 export default {
   asyncData({ req }) {
-    const { zh, audit } = req.query;
-    return { zh, audit };
+    const { zh } = req.query;
+    return { zh };
   },
   head() {
     const title = this.zh ? `昊哥說：${this.zh}` : "HowfunSong - 昊哥幫你念";
@@ -141,7 +115,6 @@ export default {
       buffering: false,
       buffered: 0,
       player: null,
-      audit: false,
       saying: false,
       showEditArea: false,
       zh: "",
@@ -180,18 +153,6 @@ export default {
         return p;
       });
       this.appendToQuery();
-      await this.playSeg(startSec, duration);
-      this.player.pauseVideo();
-    },
-    // audit mode only
-    async onUpdate({ pinyin, startSec, duration }) {
-      await fetch("/api/update", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json;charset=utf-8"
-        },
-        body: JSON.stringify({ pinyin, startSec, duration })
-      });
       await this.playSeg(startSec, duration);
       this.player.pauseVideo();
     },
@@ -274,17 +235,6 @@ export default {
         videoId: VIDEO_ID
       });
     };
-
-    // remove after audit over
-    if (this.audit) {
-      const resp = await fetch(`/api/getcurrdata`);
-      const { wordData } = await resp.json();
-      this.all_positions = Object.keys(wordData)
-        .map(k => {
-          return { pinyin: k, startSec: wordData[k], duration: 0.7 };
-        })
-        .sort((a, b) => a.startSec - b.startSec);
-    }
   }
 };
 </script>

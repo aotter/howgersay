@@ -9,7 +9,13 @@
       placeholder="請輸入起始時間  e.g. 11:12.3"
       v-model="startSecStr"
     />
-    <button type="submit" class="btn btn-dark mb-2" :disabled="saying">更新單字時間</button>
+    <button type="submit" class="btn btn-dark mb-2" :disabled="saying">調整單字時間</button>
+    <button
+      type="button"
+      class="btn btn-dark mb-2 ml-1"
+      :disabled="saying  || !shouldReport || reported"
+      @click.prevent="report"
+    >{{reported ? '完成回報': '回報更新' }}</button>
   </form>
 </template>
 <script>
@@ -17,7 +23,9 @@ export default {
   props: ["pinyin", "startSec", "duration", "saying"],
   data() {
     return {
-      tSec: 0
+      tSec: 0,
+      shouldReport: false,
+      reported: false
     };
   },
   computed: {
@@ -44,6 +52,22 @@ export default {
         startSec: this.tSec,
         duration: this.duration
       });
+      this.shouldReport = true;
+      this.reported = false;
+    },
+    async report() {
+      await fetch("/api/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=utf-8"
+        },
+        body: JSON.stringify({
+          pinyin: this.pinyin,
+          startSec: this.tSec,
+          duration: this.duration
+        })
+      });
+      this.reported = true;
     }
   },
   mounted() {
