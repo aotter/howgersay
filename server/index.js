@@ -37,7 +37,8 @@ app.get("/api/getposition", (req, res) => {
   const zh = req.query.q || "";
   const pys = pinyin(zh, { style: pinyin.STYLE_TONE2 });
   const list = pys.map(p => {
-    const pinyin = p[0];
+    let pinyin = p[0];
+    pinyin = pinyin === "nv3" ? "nyu3" : pinyin;
     return { pinyin, startSec: wordData_csv[pinyin], duration: 0.8 };
   });
   res.send(list);
